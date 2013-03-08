@@ -16,9 +16,6 @@
 
 package org.kie.guvnor.projecteditor.backend.server;
 
-import java.util.List;
-import javax.enterprise.event.Event;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.kie.commons.io.IOService;
@@ -28,9 +25,14 @@ import org.kie.guvnor.project.backend.server.POMContentHandler;
 import org.kie.guvnor.services.metadata.MetadataService;
 import org.uberfire.backend.server.util.Paths;
 import org.uberfire.backend.vfs.Path;
+import org.uberfire.client.workbench.widgets.events.ResourceAddedEvent;
 import org.uberfire.security.Identity;
 
-import static org.junit.Assert.*;
+import javax.enterprise.event.Event;
+
+import java.util.List;
+
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 public class KModuleServiceImplTest {
@@ -58,6 +60,7 @@ public class KModuleServiceImplTest {
                                               paths,
                                               kProjectContentHandler,
                                               mock( Identity.class ),
+                                              mock( Event.class ),
                                               mock( Event.class ) );
     }
 
@@ -79,8 +82,8 @@ public class KModuleServiceImplTest {
     @Test
     public void testSetUpProjectStructure() throws Exception {
 
-        Path pathToProjectRoot = mock( Path.class );
-        org.kie.commons.java.nio.file.Path directory = setUpPathToProjectRoot( pathToProjectRoot );
+        Path pathToPom = mock( Path.class );
+        org.kie.commons.java.nio.file.Path directory = setUpPathToPomDirectory( pathToPom );
 
         org.kie.commons.java.nio.file.Path mainJava = mock( org.kie.commons.java.nio.file.Path.class );
         setUpDirectory( directory, "src/main/java", mainJava );
@@ -94,7 +97,7 @@ public class KModuleServiceImplTest {
         org.kie.commons.java.nio.file.Path kmodule = mock( org.kie.commons.java.nio.file.Path.class );
         setUpDirectory( directory, "src/main/resources/META-INF/kmodule.xml", kmodule );
 
-        serviceImpl.setUpKModuleStructure( pathToProjectRoot );
+        serviceImpl.setUpKModuleStructure( pathToPom );
 
         verify( ioService ).createDirectory( mainJava );
         verify( ioService ).createDirectory( mainResources );
@@ -104,15 +107,20 @@ public class KModuleServiceImplTest {
         verify( ioService ).write( eq( kmodule ), anyString() );
     }
 
-    private org.kie.commons.java.nio.file.Path setUpPathToProjectRoot( Path pathToProjectRoot ) {
-        org.kie.commons.java.nio.file.Path nioPath = mock( org.kie.commons.java.nio.file.Path.class );
+    private org.kie.commons.java.nio.file.Path setUpPathToPomDirectory( Path pathToPom ) {
+        org.kie.commons.java.nio.file.Path child = mock( org.kie.commons.java.nio.file.Path.class );
         when(
-                paths.convert( pathToProjectRoot )
+                paths.convert( pathToPom )
             ).thenReturn(
-                nioPath
+                child
                         );
-
-        return nioPath;
+        org.kie.commons.java.nio.file.Path directory = mock( org.kie.commons.java.nio.file.Path.class );
+        when(
+                child.getParent()
+            ).thenReturn(
+                directory
+                        );
+        return directory;
     }
 
     private void setUpDirectory( org.kie.commons.java.nio.file.Path directory,

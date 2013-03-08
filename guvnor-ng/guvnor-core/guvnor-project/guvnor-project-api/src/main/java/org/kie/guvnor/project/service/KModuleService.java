@@ -18,15 +18,20 @@ package org.kie.guvnor.project.service;
 
 import org.jboss.errai.bus.server.annotations.Remote;
 import org.kie.guvnor.project.model.KModuleModel;
-import org.kie.guvnor.services.file.SupportsRead;
-import org.kie.guvnor.services.file.SupportsUpdate;
+import org.kie.guvnor.services.metadata.model.Metadata;
 import org.uberfire.backend.vfs.Path;
 
 @Remote
-public interface KModuleService extends SupportsRead<KModuleModel>,
-                                        SupportsUpdate<KModuleModel> {
+public interface KModuleService {
 
-    public Path setUpKModuleStructure( Path projectRoot );
+    public Path setUpKModuleStructure( Path pathToPom );
+
+    public void saveKModule( String commitMessage,
+                             Path path,
+                             KModuleModel model,
+                             Metadata metadata );
+
+    public KModuleModel loadKModule( Path path );
 
     public Path pathToRelatedKModuleFileIfAny( Path pathToPomXML );
 

@@ -71,7 +71,7 @@ public class POMEditorPanel
                         view.setDependencies( POMEditorPanel.this.model.getDependencies() );
                     }
                 }
-                             ).load( path );
+                             ).loadPOM( path );
     }
 
     private void setTitle( String titleText ) {
@@ -94,7 +94,7 @@ public class POMEditorPanel
                         view.showSaveSuccessful( "pom.xml" );
                     }
                 }
-                             ).save( path, model, metadata, commitMessage );
+                             ).savePOM( commitMessage, path, model, metadata );
     }
 
     @Override
